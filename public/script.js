@@ -138,6 +138,7 @@ const handleApplication = () => {
                         ${item.imageUrl ? `<img src="${item.imageUrl}" alt="${item.title}">` : ""}
                         <p>Posted by: ${username}</p>
                         <small>${new Date(item.createdAt).toLocaleString()}</small>
+                        // <button>Connect with seller</button>
                     `;
                     itemsContainer.appendChild(div);
                 });
