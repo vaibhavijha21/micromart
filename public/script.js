@@ -6,6 +6,7 @@ const handleAuthentication = () => {
     const showSigninLink = document.getElementById("showSignin");
     const showSignupLink = document.getElementById("showSignup");
     const authTitle = document.getElementById("auth-title");
+    const authForms = document.getElementById("auth-forms");
 
     // Check for an active session. If found, redirect to the app page.
     if (localStorage.getItem('currentUser')) {
@@ -15,16 +16,20 @@ const handleAuthentication = () => {
 
     showSigninLink.addEventListener('click', (e) => {
         e.preventDefault();
-        signupForm.style.display = 'none';
-        signinForm.style.display = 'block';
+        authForms.classList.add('switching');
+        authForms.classList.remove('mode-signup');
+        authForms.classList.add('mode-signin');
         authTitle.textContent = "Sign In";
+        setTimeout(() => authForms.classList.remove('switching'), 220);
     });
 
     showSignupLink.addEventListener('click', (e) => {
         e.preventDefault();
-        signinForm.style.display = 'none';
-        signupForm.style.display = 'block';
+        authForms.classList.add('switching');
+        authForms.classList.remove('mode-signin');
+        authForms.classList.add('mode-signup');
         authTitle.textContent = "Sign Up";
+        setTimeout(() => authForms.classList.remove('switching'), 220);
     });
 
     signupForm.addEventListener("submit", async (e) => {
