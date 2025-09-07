@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ScrapExchange</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+<div id="app-content">
+<div class="user-info">
+<span id="welcome-message"></span>
+<button id="signoutBtn">Sign Out</button>
+</div>
+
+<h2>Post an Item</h2>
+<form id="itemForm">
+<input type="text" id="title" placeholder="Item Title" required>
+<textarea id="description" placeholder="Description" required></textarea>
+<input type="text" id="imageUrl" placeholder="Image URL (optional)">
+<button type="submit">Post Item</button>
+</form>
+
+<h2>All Items</h2>
+<div id="itemsContainer"></div>
+
+</div>
+
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>

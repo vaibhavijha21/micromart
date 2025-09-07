@@ -1,0 +1,4 @@
+body { font-family: Arial; padding: 20px; }
+form { margin-bottom: 30px; }
+input, textarea { display: block; margin: 10px 0; width: 300px; }
+.item { border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; }
