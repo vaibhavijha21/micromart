@@ -1,31 +1,29 @@
 const API_URL = "http://localhost:5000";
 
-// Handle authentication page logic (for index.html)
-const handleAuthPage = () => {
+const handleAuthentication = () => {
     const signupForm = document.getElementById("signupForm");
     const signinForm = document.getElementById("signinForm");
     const showSigninLink = document.getElementById("showSignin");
     const showSignupLink = document.getElementById("showSignup");
     const authTitle = document.getElementById("auth-title");
 
-    // Check for a logged-in user on load and redirect
-    const user = localStorage.getItem('currentUser');
-    if (user) {
-        window.location.href = '/app';
+    // Check for an active session. If found, redirect to the app page.
+    if (localStorage.getItem('currentUser')) {
+        window.location.href = '/app.html';
         return;
     }
 
     showSigninLink.addEventListener('click', (e) => {
         e.preventDefault();
-        signupForm.classList.remove('active');
-        signinForm.classList.add('active');
+        signupForm.style.display = 'none';
+        signinForm.style.display = 'block';
         authTitle.textContent = "Sign In";
     });
 
     showSignupLink.addEventListener('click', (e) => {
         e.preventDefault();
-        signinForm.classList.remove('active');
-        signupForm.classList.add('active');
+        signinForm.style.display = 'none';
+        signupForm.style.display = 'block';
         authTitle.textContent = "Sign Up";
     });
 
@@ -76,8 +74,7 @@ const handleAuthPage = () => {
     });
 };
 
-// Handle main application page logic (for app.html)
-const handleAppPage = () => {
+const handleApplication = () => {
     const itemForm = document.getElementById("itemForm");
     const itemsContainer = document.getElementById("itemsContainer");
     const welcomeMessage = document.getElementById("welcome-message");
@@ -85,8 +82,9 @@ const handleAppPage = () => {
 
     const currentUser = JSON.parse(localStorage.getItem('currentUser'));
 
+    // If no user is logged in, redirect to the sign-in page.
     if (!currentUser) {
-        window.location.href = '/';
+        window.location.href = '/index.html';
         return;
     }
 
@@ -94,7 +92,7 @@ const handleAppPage = () => {
 
     signoutBtn.addEventListener('click', () => {
         localStorage.removeItem('currentUser');
-        window.location.href = '/';
+        window.location.href = '/index.html';
     });
 
     itemForm.addEventListener("submit", async (e) => {
@@ -149,9 +147,10 @@ const handleAppPage = () => {
     getItems();
 };
 
-// Determine which page's logic to run
-if (window.location.pathname === '/' || window.location.pathname === '/index.html') {
-    handleAuthPage();
-} else if (window.location.pathname === '/app.html') {
-    handleAppPage();
-}
+document.addEventListener('DOMContentLoaded', () => {
+    if (document.getElementById('signupForm') && document.getElementById('signinForm')) {
+        handleAuthentication();
+    } else if (document.getElementById('itemForm')) {
+        handleApplication();
+    }
+});
