@@ -4,35 +4,159 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ScrapExchange</title>
+<title>MicroMart</title>
 <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
 
-<div class="container">
-<div id="app-content">
-<div class="user-info">
-<span id="welcome-message"></span>
-<button id="signoutBtn">Sign Out</button>
-<button id="myChatsBtn">My Chats</button>
-</div>
-<h2>Post an Item</h2>
-<form id="itemForm">
-<label for="imageInput" class="custom-file-upload">
-<i class="fas fa-camera"></i> Upload an Image
-</label>
-<input type="file" id="imageInput" accept="image/*">
-<p id="loading-message" class="hidden">Analyzing image...</p>
-<input type="text" id="title" placeholder="Item Title" required>
-<textarea id="description" placeholder="Description" required></textarea>
-<input type="hidden" id="imageUrl">
-<button type="submit">Post Item</button>
-</form>
+<div class="app-layout">
+    <!-- Left Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2><i class="fas fa-recycle"></i> MicroMart</h2>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="#" class="nav-item active" data-section="home">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </a>
+            <a href="#" class="nav-item" data-section="chats">
+                <i class="fas fa-comments"></i>
+                <span>Chat</span>
+            </a>
+            <a href="#" class="nav-item" data-section="profile">
+                <i class="fas fa-user"></i>
+                <span>User</span>
+            </a>
+            <a href="#" class="nav-item" data-section="settings">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </a>
+        </nav>
+    </div>
 
-<h2>All Items</h2>
-<div id="itemsContainer"></div>
+    <!-- Main Content Area -->
+    <div class="main-content">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <div class="top-bar-left">
+                <span class="welcome-text">Welcome <span id="welcome-message"></span></span>
+            </div>
+            <div class="top-bar-right">
+                <button id="postItemBtn" class="top-btn">
+                    <i class="fas fa-plus"></i> Post Item
+                </button>
+                <button id="requestBtn" class="top-btn">
+                    <i class="fas fa-hand-paper"></i> Request
+                </button>
+                <button id="signoutBtn" class="top-btn signout">
+                    <i class="fas fa-sign-out-alt"></i> Sign Out
+                </button>
+            </div>
+        </div>
 
+        <!-- Search Bar -->
+        <div class="search-container">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Search items...">
+            </div>
+        </div>
+
+        <!-- Content Sections -->
+        <div class="content-sections">
+            <!-- Home Section -->
+            <div id="home-section" class="content-section active">
+                <div class="section-header">
+                    <h2>All Items</h2>
+                </div>
+                <div id="itemsContainer" class="items-grid"></div>
+            </div>
+
+            <!-- Chat Section -->
+            <div id="chats-section" class="content-section">
+                <div class="chat-layout">
+                    <div class="chat-sidebar">
+                        <div class="chat-sidebar-header">
+                            <h3>My Chats</h3>
+                        </div>
+                        <div class="chat-users-list">
+                            <ul id="chatPartnersListInline"></ul>
+                        </div>
+                    </div>
+                    <div class="chat-main-area">
+                        <div class="chat-messages-container">
+                            <div id="messagesInline" class="chat-messages"></div>
+                        </div>
+                        <form id="chat-form-inline" class="chat-input-form">
+                            <input type="text" id="chat-input-inline" placeholder="Type a message...">
+                            <button type="submit">Send</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Section -->
+            <div id="profile-section" class="content-section">
+                <div class="section-header">
+                    <h2>User Profile</h2>
+                </div>
+                <div class="profile-content">
+                    <p>Profile information will be displayed here.</p>
+                </div>
+            </div>
+
+            <!-- Settings Section -->
+            <div id="settings-section" class="content-section">
+                <div class="section-header">
+                    <h2>Settings</h2>
+                </div>
+                <div class="settings-content">
+                    <p>Settings options will be displayed here.</p>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<!-- Post Item Modal/Form (preserving existing functionality) -->
+<div id="postItemModal" class="modal hidden">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Post an Item</h2>
+            <button id="closePostModal" class="close-btn">&times;</button>
+        </div>
+        <form id="itemForm">
+            <p class="custom-file-upload">
+                Upload an Image
+            </p>
+            <input type="file" id="imageInput" accept="image/*">
+            <p id="loading-message" class="hidden">Analyzing image...</p>
+            <input type="text" id="title" placeholder="Item Title" required>
+            <textarea id="description" placeholder="Description" required></textarea>
+            <input type="hidden" id="imageUrl">
+            <button type="submit">Post Item</button>
+        </form>
+    </div>
+</div>
+
+<!-- Chat Container (preserving existing functionality) -->
+<div id="chatsListContainer" class="hidden">
+    <h2>My Chats</h2>
+    <ul id="chatPartnersList"></ul>
+</div>
+
+<div id="chat-container" class="hidden" data-seller="">
+    <div id="chat-header">
+        <span id="chat-username"></span>
+        <button id="closeChat">&times;</button>
+    </div>
+    <div id="messages"></div>
+    <form id="chat-form">
+        <input type="text" id="chat-input" placeholder="Type a message...">
+        <button type="submit">Send</button>
+    </form>
 </div>
 <script src="https://www.google.com/search?q=https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 <script src="/socket.io/socket.io.js"></script>
