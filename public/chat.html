@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Chats</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container chat-container-page">
+    <div class="user-info">
+        <a href="/app.html" class="back-btn">&larr; Back to Items</a>
+        <span id="welcome-message"></span>
+        <button id="signoutBtn">Sign Out</button>
+    </div>
+
+    <div class="chat-main">
+        <div class="chat-list-sidebar">
+            <h2>My Chats</h2>
+            <ul id="chatPartnersList"></ul>
+        </div>
+
+        <div class="chat-box-area">
+            <div id="chat-container-full" class="hidden">
+                <div id="chat-header-full">
+                    <span id="chat-username-full"></span>
+                </div>
+                <div id="messages-full"></div>
+                <form id="chat-form-full">
+                    <input type="text" id="chat-input-full" placeholder="Type a message...">
+                    <button type="submit">Send</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script src="script.js"></script>
+
+</body>
+</html>

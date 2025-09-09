@@ -7,7 +7,6 @@ const handleAuthentication = () => {
     const showSignupLink = document.getElementById("showSignup");
     const authTitle = document.getElementById("auth-title");
 
-    // Check for an active session. If found, redirect to the app page.
     if (localStorage.getItem('currentUser')) {
         window.location.href = '/app.html';
         return;
@@ -86,14 +85,6 @@ const handleApplication = () => {
     const loadingMessage = document.getElementById("loading-message");
     const imageUrlInput = document.getElementById("imageUrl");
 
-    const chatContainer = document.getElementById('chat-container');
-    const chatUsername = document.getElementById('chat-username');
-    const closeChatBtn = document.getElementById('closeChat');
-    const messagesContainer = document.getElementById('messages');
-    const chatForm = document.getElementById('chat-form');
-    const chatInput = document.getElementById('chat-input');
-    const socket = io(API_URL);
-
     const currentUser = JSON.parse(localStorage.getItem('currentUser'));
 
     if (!currentUser) {
@@ -108,32 +99,8 @@ const handleApplication = () => {
         window.location.href = '/index.html';
     });
     
-    myChatsBtn.addEventListener('click', async () => {
-        const chatsListContainer = document.getElementById('chatsListContainer');
-        const chatPartnersList = document.getElementById('chatPartnersList');
-        chatsListContainer.classList.toggle('hidden');
-
-        if (!chatsListContainer.classList.contains('hidden')) {
-            try {
-                const res = await fetch(`${API_URL}/my-chats/${currentUser.username}`);
-                const chatPartners = await res.json();
-                chatPartnersList.innerHTML = '';
-                if (chatPartners.length > 0) {
-                    chatPartners.forEach(partner => {
-                        const li = document.createElement('li');
-                        li.textContent = partner;
-                        li.addEventListener('click', () => {
-                            openChat(partner);
-                        });
-                        chatPartnersList.appendChild(li);
-                    });
-                } else {
-                    chatPartnersList.innerHTML = '<li>No active chats.</li>';
-                }
-            } catch (error) {
-                console.error("Error fetching chat partners:", error);
-            }
-        }
+    myChatsBtn.addEventListener('click', () => {
+        window.location.href = '/chat.html';
     });
 
     imageInput.addEventListener('change', async (e) => {
@@ -209,7 +176,7 @@ const handleApplication = () => {
                 document.querySelectorAll('.connect-btn').forEach(button => {
                     button.addEventListener('click', (e) => {
                         const seller = e.target.dataset.seller;
-                        openChat(seller);
+                        window.location.href = `/chat.html?seller=${seller}`;
                     });
                 });
             } else {
@@ -219,68 +186,117 @@ const handleApplication = () => {
             console.error("Failed to load items:", error);
         }
     }
+    
+    getItems();
+};
+
+const handleChatPage = () => {
+    const welcomeMessage = document.getElementById('welcome-message');
+    const signoutBtn = document.getElementById('signoutBtn');
+    const chatPartnersList = document.getElementById('chatPartnersList');
+    const chatContainerFull = document.getElementById('chat-container-full');
+    const chatUsernameFull = document.getElementById('chat-username-full');
+    const messagesFull = document.getElementById('messages-full');
+    const chatFormFull = document.getElementById('chat-form-full');
+    const chatInputFull = document.getElementById('chat-input-full');
+    const socket = io(API_URL);
+
+    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+
+    if (!currentUser) {
+        window.location.href = '/index.html';
+        return;
+    }
+    welcomeMessage.textContent = `Welcome, ${currentUser.username}!`;
+    signoutBtn.addEventListener('click', () => {
+        localStorage.removeItem('currentUser');
+        window.location.href = '/index.html';
+    });
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const initialSeller = urlParams.get('seller');
+
+    async function loadChatPartners() {
+        try {
+            const res = await fetch(`${API_URL}/my-chats/${currentUser.username}`);
+            const chatPartners = await res.json();
+            chatPartnersList.innerHTML = '';
+            chatPartners.forEach(partner => {
+                const li = document.createElement('li');
+                li.className = 'chat-partner-item';
+                li.textContent = partner;
+                li.addEventListener('click', () => openChat(partner));
+                chatPartnersList.appendChild(li);
+            });
+        } catch (error) {
+            console.error('Error fetching chat partners:', error);
+        }
+    }
 
     async function openChat(sellerUsername) {
-        chatContainer.classList.remove('hidden');
-        chatUsername.textContent = sellerUsername;
-        chatContainer.dataset.seller = sellerUsername;
-        messagesContainer.innerHTML = '';
-        document.getElementById('chatsListContainer').classList.add('hidden');
+        chatContainerFull.classList.remove('hidden');
+        chatUsernameFull.textContent = sellerUsername;
+        chatContainerFull.dataset.seller = sellerUsername;
+        messagesFull.innerHTML = '';
 
         const buyer = currentUser.username;
-        const roomName = [buyer, sellerUsername].sort().join('_');
         socket.emit('joinChat', { user1: buyer, user2: sellerUsername });
 
         try {
             const res = await fetch(`${API_URL}/chat-history?user1=${buyer}&user2=${sellerUsername}`);
             const messages = await res.json();
-            messages.forEach(msg => displayMessage(msg));
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            messages.forEach(msg => displayMessage(msg, messagesFull));
+            messagesFull.scrollTop = messagesFull.scrollHeight;
         } catch (error) {
             console.error('Failed to load chat history:', error);
         }
     }
 
-    closeChatBtn.addEventListener('click', () => {
-        chatContainer.classList.add('hidden');
-    });
-
-    chatForm.addEventListener('submit', (e) => {
+    chatFormFull.addEventListener('submit', (e) => {
         e.preventDefault();
-        const message = chatInput.value;
-        const receiver = chatContainer.dataset.seller;
+        const message = chatInputFull.value;
+        const receiver = chatContainerFull.dataset.seller;
         if (message && receiver) {
             socket.emit('chatMessage', {
                 sender: currentUser.username,
                 receiver: receiver,
                 message: message
             });
-            chatInput.value = '';
+            chatInputFull.value = '';
         }
     });
 
     socket.on('message', (msg) => {
-        displayMessage(msg);
-        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        const currentSeller = chatContainerFull.dataset.seller;
+        if (msg.sender === currentSeller || msg.receiver === currentSeller) {
+            displayMessage(msg, messagesFull);
+            messagesFull.scrollTop = messagesFull.scrollHeight;
+        }
     });
 
-    function displayMessage(msg) {
+    function displayMessage(msg, container) {
         const div = document.createElement('div');
         div.className = `message ${msg.sender === currentUser.username ? 'sent' : 'received'}`;
         div.innerHTML = `
             <p class="message-text">${msg.message}</p>
             <span class="message-time">${new Date(msg.timestamp).toLocaleTimeString()}</span>
         `;
-        messagesContainer.appendChild(div);
+        container.appendChild(div);
     }
-    
-    getItems();
+
+    loadChatPartners();
+    if (initialSeller) {
+        openChat(initialSeller);
+    }
 };
 
 document.addEventListener('DOMContentLoaded', () => {
-    if (document.getElementById('signupForm') && document.getElementById('signinForm')) {
+    const path = window.location.pathname;
+    if (path === '/' || path === '/index.html') {
         handleAuthentication();
-    } else if (document.getElementById('itemForm')) {
+    } else if (path === '/app.html') {
         handleApplication();
+    } else if (path === '/chat.html') {
+        handleChatPage();
     }
 });

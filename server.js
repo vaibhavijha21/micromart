@@ -206,6 +206,10 @@ app.get('/my-chats/:username', async (req, res) => {
     }
 });
 
+app.get('/chat.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public/chat.html'));
+});
+
 // Socket.IO for real-time chat
 io.on('connection', (socket) => {
     socket.on('joinChat', (data) => {
@@ -231,6 +235,7 @@ io.on('connection', (socket) => {
 server.listen(port, () => {
     console.log(`Server is running on port: ${port}`);
 });
+
 
 
 
