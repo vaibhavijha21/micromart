@@ -14,11 +14,7 @@
     #itemsContainer{
         color:white;
     }
-    h2{
-        color:white;
-    }
 </style>
-
 <body>
 
 <div class="container">
@@ -28,22 +24,41 @@
 <button id="signoutBtn">Sign Out</button>
 </div>
 
-<h2>Post an Item</h2>
-<form id="itemForm">
-<input type="text" id="title" placeholder="Item Title" required>
-<textarea id="description" placeholder="Description" required></textarea>
-<input type="text" id="imageUrl" placeholder="Image URL (optional)">
-<button type="submit">Post Item</button>
-</form>
+<div class="dashboard-header">
+<h1>ScrapExchange Dashboard</h1>
+<button id="addItemBtn" class="add-item-btn">
+<i class="fas fa-plus"></i> Post New Item
+</button>
+</div>
 
 <h2>All Items</h2>
-<div id="itemsContainer">
-    <button>Connect with seller</button>
+<div id="itemsContainer"></div>
+</div>
+
+<!-- Popup Modal for Item Form -->
+<div id="itemModal" class="modal">
+<div class="modal-content">
+<div class="modal-header">
+<h2>Post an Item</h2>
+<span class="close">&times;</span>
+</div>
+<form id="itemForm">
+<label for="imageInput" class="custom-file-upload">
+<i class="fas fa-camera"></i> Upload an Image
+</label>
+<input type="file" id="imageInput" accept="image/*">
+<p id="loading-message" class="hidden">Analyzing image...</p>
+<input type="text" id="title" placeholder="Item Title" required>
+<textarea id="description" placeholder="Description" required></textarea>
+<input type="hidden" id="imageUrl">
+<button type="submit">Post Item</button>
+</form>
+</div>
 </div>
 
 </div>
 
-</div>
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 
 <script src="script.js"></script>
 
