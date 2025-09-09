@@ -6,30 +6,27 @@ const handleAuthentication = () => {
     const showSigninLink = document.getElementById("showSignin");
     const showSignupLink = document.getElementById("showSignup");
     const authTitle = document.getElementById("auth-title");
-    const authForms = document.getElementById("auth-forms");
 
-    // Check for an active session. If found, redirect to the app page.
     if (localStorage.getItem('currentUser')) {
         window.location.href = '/app.html';
         return;
     }
 
+    // Show the sign-up form by default
+    signupForm.classList.add('active');
+
     showSigninLink.addEventListener('click', (e) => {
         e.preventDefault();
-        authForms.classList.add('switching');
-        authForms.classList.remove('mode-signup');
-        authForms.classList.add('mode-signin');
+        signupForm.classList.remove('active');
+        signinForm.classList.add('active');
         authTitle.textContent = "Sign In";
-        setTimeout(() => authForms.classList.remove('switching'), 220);
     });
 
     showSignupLink.addEventListener('click', (e) => {
         e.preventDefault();
-        authForms.classList.add('switching');
-        authForms.classList.remove('mode-signin');
-        authForms.classList.add('mode-signup');
+        signinForm.classList.remove('active');
+        signupForm.classList.add('active');
         authTitle.textContent = "Sign Up";
-        setTimeout(() => authForms.classList.remove('switching'), 220);
     });
 
     signupForm.addEventListener("submit", async (e) => {
@@ -84,10 +81,22 @@ const handleApplication = () => {
     const itemsContainer = document.getElementById("itemsContainer");
     const welcomeMessage = document.getElementById("welcome-message");
     const signoutBtn = document.getElementById("signoutBtn");
+    const imageInput = document.getElementById("imageInput");
+    const titleInput = document.getElementById("title");
+    const descriptionInput = document.getElementById("description");
+    const loadingMessage = document.getElementById("loading-message");
+    const imageUrlInput = document.getElementById("imageUrl");
+
+    const chatContainer = document.getElementById('chat-container');
+    const chatUsername = document.getElementById('chat-username');
+    const closeChatBtn = document.getElementById('closeChat');
+    const messagesContainer = document.getElementById('messages');
+    const chatForm = document.getElementById('chat-form');
+    const chatInput = document.getElementById('chat-input');
+    const socket = io(API_URL);
 
     const currentUser = JSON.parse(localStorage.getItem('currentUser'));
 
-    // If no user is logged in, redirect to the sign-in page.
     if (!currentUser) {
         window.location.href = '/index.html';
         return;
@@ -99,12 +108,40 @@ const handleApplication = () => {
         localStorage.removeItem('currentUser');
         window.location.href = '/index.html';
     });
+    
+    imageInput.addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        loadingMessage.style.display = 'block';
+        const reader = new FileReader();
+        reader.onloadend = async () => {
+            const base64Image = reader.result.split(',')[1];
+            try {
+                const res = await fetch(`${API_URL}/ai-analyze-image`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ base64Image })
+                });
+                const data = await res.json();
+                titleInput.value = data.title;
+                descriptionInput.value = data.description;
+                imageUrlInput.value = `data:image/jpeg;base64,${base64Image}`;
+            } catch (error) {
+                console.error("Error during AI analysis:", error);
+                alert("Failed to analyze image. Please fill out the form manually.");
+            } finally {
+                loadingMessage.style.display = 'none';
+            }
+        };
+        reader.readAsDataURL(file);
+    });
 
     itemForm.addEventListener("submit", async (e) => {
         e.preventDefault();
-        const title = itemForm.title.value;
-        const description = itemForm.description.value;
-        const imageUrl = itemForm.imageUrl.value;
+        const title = titleInput.value;
+        const description = descriptionInput.value;
+        const imageUrl = imageUrlInput.value;
         const postedBy = currentUser.username;
 
         try {
@@ -138,9 +175,15 @@ const handleApplication = () => {
                         ${item.imageUrl ? `<img src="${item.imageUrl}" alt="${item.title}">` : ""}
                         <p>Posted by: ${username}</p>
                         <small>${new Date(item.createdAt).toLocaleString()}</small>
-                        // <button>Connect with seller</button>
+                        ${username !== currentUser.username ? `<button class="connect-btn" data-seller="${username}">Connect with Seller</button>` : ''}
                     `;
                     itemsContainer.appendChild(div);
+                });
+                document.querySelectorAll('.connect-btn').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const seller = e.target.dataset.seller;
+                        openChat(seller);
+                    });
                 });
             } else {
                 itemsContainer.innerHTML = '<p>No items available. Be the first to add one!</p>';
@@ -150,6 +193,58 @@ const handleApplication = () => {
         }
     }
 
+    async function openChat(sellerUsername) {
+        chatContainer.classList.remove('hidden');
+        chatUsername.textContent = sellerUsername;
+        messagesContainer.innerHTML = '';
+
+        const buyer = currentUser.username;
+        const roomName = [buyer, sellerUsername].sort().join('_');
+        socket.emit('joinChat', { user1: buyer, user2: sellerUsername });
+
+        try {
+            const res = await fetch(`${API_URL}/chat-history?user1=${buyer}&user2=${sellerUsername}`);
+            const messages = await res.json();
+            messages.forEach(msg => displayMessage(msg));
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        } catch (error) {
+            console.error('Failed to load chat history:', error);
+        }
+    }
+
+    closeChatBtn.addEventListener('click', () => {
+        chatContainer.classList.add('hidden');
+    });
+
+    chatForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const message = chatInput.value;
+        const receiver = chatUsername.textContent;
+        if (message) {
+            socket.emit('chatMessage', {
+                sender: currentUser.username,
+                receiver: receiver,
+                message: message
+            });
+            chatInput.value = '';
+        }
+    });
+
+    socket.on('message', (msg) => {
+        displayMessage(msg);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    });
+
+    function displayMessage(msg) {
+        const div = document.createElement('div');
+        div.className = `message ${msg.sender === currentUser.username ? 'sent' : 'received'}`;
+        div.innerHTML = `
+            <p class="message-text">${msg.message}</p>
+            <span class="message-time">${new Date(msg.timestamp).toLocaleTimeString()}</span>
+        `;
+        messagesContainer.appendChild(div);
+    }
+    
     getItems();
 };
 

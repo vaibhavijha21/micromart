@@ -3,13 +3,23 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv').config();
 const path = require('path');
+const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
+const http = require('http');
+const { Server } = require('socket.io');
 
 const app = express();
 const port = process.env.PORT || 5000;
 
-// Middleware
+const server = http.createServer(app);
+const io = new Server(server, {
+    cors: {
+        origin: "*",
+        methods: ["GET", "POST"]
+    }
+});
+
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '5mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // MongoDB Connection
@@ -18,7 +28,7 @@ mongoose.connect(uri)
     .then(() => console.log('MongoDB connection established successfully'))
     .catch(err => console.log('MongoDB connection error:', err));
 
-// Define User and Item Schemas with Mongoose
+// Define User, Item, and Chat Schemas
 const userSchema = new mongoose.Schema({
     username: { type: String, required: true, unique: true },
     email: { type: String, required: true, unique: true },
@@ -36,8 +46,16 @@ const itemSchema = new mongoose.Schema({
     timestamps: true,
 });
 
+const chatSchema = new mongoose.Schema({
+    sender: { type: String, required: true },
+    receiver: { type: String, required: true },
+    message: { type: String, required: true },
+    timestamp: { type: Date, default: Date.now }
+});
+
 const User = mongoose.model('User', userSchema);
 const Item = mongoose.model('Item', itemSchema);
+const Chat = mongoose.model('Chat', chatSchema);
 
 // API Routes
 app.post('/users/signup', async (req, res) => {
@@ -96,16 +114,98 @@ app.post('/items', async (req, res) => {
     }
 });
 
-// Route to serve the main application page
+app.post('/ai-analyze-image', async (req, res) => {
+    const { base64Image } = req.body;
+    const prompt = "Analyze this scrap item. Provide a short, concise, two-word title, and a detailed, 2-sentence description of the item, its material, and its potential use for recycling. Format the output as a JSON object with 'title' and 'description' keys. Do not include any other text in the response.";
+
+    const payload = {
+        contents: [{
+            parts: [
+                { text: prompt },
+                {
+                    inlineData: {
+                        mimeType: "image/jpeg",
+                        data: base64Image
+                    }
+                }
+            ]
+        }],
+    };
+
+    const apiKey = process.env.GEMINI_API_KEY;
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+
+    try {
+        const aiResponse = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        const aiResult = await aiResponse.json();
+        
+        if (aiResult.candidates && aiResult.candidates.length > 0) {
+            let generatedText = aiResult.candidates[0].content.parts[0].text;
+            generatedText = generatedText.replace(/^```json\n|```$/g, '').trim(); 
+            const parsedJson = JSON.parse(generatedText);
+            res.json(parsedJson);
+        } else {
+            res.status(500).json({ error: "AI model did not return a valid response." });
+        }
+    } catch (error) {
+        console.error("Error calling AI API:", error);
+        res.status(500).json({ error: "Failed to analyze image." });
+    }
+});
+
 app.get('/app.html', (req, res) => {
     res.sendFile(path.join(__dirname, 'public/app.html'));
 });
 
-// Fallback for root path to serve index.html
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public/index.html'));
 });
 
-app.listen(port, () => {
+app.get('/chat-history', async (req, res) => {
+    const { user1, user2 } = req.query;
+    try {
+        const messages = await Chat.find({
+            $or: [
+                { sender: user1, receiver: user2 },
+                { sender: user2, receiver: user1 }
+            ]
+        }).sort({ timestamp: 1 });
+        res.json(messages);
+    } catch (err) {
+        res.status(500).json({ error: 'Failed to load chat history.' });
+    }
+});
+
+// Socket.IO for real-time chat
+io.on('connection', (socket) => {
+    socket.on('joinChat', (data) => {
+        const roomName = [data.user1, data.user2].sort().join('_');
+        socket.join(roomName);
+    });
+
+    socket.on('chatMessage', async (data) => {
+        const roomName = [data.sender, data.receiver].sort().join('_');
+        const newMessage = new Chat({
+            sender: data.sender,
+            receiver: data.receiver,
+            message: data.message,
+        });
+        await newMessage.save();
+        io.to(roomName).emit('message', newMessage);
+    });
+
+    socket.on('disconnect', () => {
+    });
+});
+
+server.listen(port, () => {
     console.log(`Server is running on port: ${port}`);
 });
+
+// The fix is on this line: `const apiKey = process.env.GEMINI_API_KEY;`. This ensures your code is reading the environment variable correctly. You must make sure your `.env` file has the line `GEMINI_API_KEY=your_copied_api_key`. 
+
+// After you've updated both files, remember to **stop your server** (by pressing `Ctrl + C` in the terminal) and **start it again** with `node server.js` to load the changes. Your AI feature should now be working!
