@@ -8,14 +8,17 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
 <div class="container">
 <div id="app-content">
 <div class="user-info">
 <span id="welcome-message"></span>
 <button id="signoutBtn">Sign Out</button>
+<button id="myChatsBtn" class="my-chats-btn hidden">My Chats</button>
 </div>
-
+<div id="chatsListContainer" class="hidden">
+<h2>My Chats</h2>
+<ul id="chatPartnersList"></ul>
+</div>
 <h2>Post an Item</h2>
 <form id="itemForm">
 <label for="imageInput" class="custom-file-upload">
@@ -28,11 +31,9 @@
 <input type="hidden" id="imageUrl">
 <button type="submit">Post Item</button>
 </form>
-
 <h2>All Items</h2>
 <div id="itemsContainer"></div>
-
-<div id="chat-container" class="hidden">
+<div id="chat-container" class="hidden" data-seller="">
 <div id="chat-header">
 <span id="chat-username"></span>
 <button id="closeChat">&times;</button>
@@ -48,6 +49,5 @@
 <script src="https://www.google.com/search?q=https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 <script src="/socket.io/socket.io.js"></script>
 <script src="script.js"></script>
-
 </body>
 </html>

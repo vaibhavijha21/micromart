@@ -180,6 +180,32 @@ app.get('/chat-history', async (req, res) => {
     }
 });
 
+app.get('/my-chats/:username', async (req, res) => {
+    const { username } = req.params;
+    try {
+        const chats = await Chat.find({
+            $or: [
+                { sender: username },
+                { receiver: username }
+            ]
+        }).select('sender receiver -_id');
+
+        const chatPartners = new Set();
+        chats.forEach(chat => {
+            if (chat.sender !== username) {
+                chatPartners.add(chat.sender);
+            }
+            if (chat.receiver !== username) {
+                chatPartners.add(chat.receiver);
+            }
+        });
+
+        res.json(Array.from(chatPartners));
+    } catch (err) {
+        res.status(500).json({ error: 'Failed to load chat list.' });
+    }
+});
+
 // Socket.IO for real-time chat
 io.on('connection', (socket) => {
     socket.on('joinChat', (data) => {
@@ -205,6 +231,8 @@ io.on('connection', (socket) => {
 server.listen(port, () => {
     console.log(`Server is running on port: ${port}`);
 });
+
+
 
 // The fix is on this line: `const apiKey = process.env.GEMINI_API_KEY;`. This ensures your code is reading the environment variable correctly. You must make sure your `.env` file has the line `GEMINI_API_KEY=your_copied_api_key`. 
 

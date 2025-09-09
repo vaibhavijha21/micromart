@@ -7,25 +7,23 @@ const handleAuthentication = () => {
     const showSignupLink = document.getElementById("showSignup");
     const authTitle = document.getElementById("auth-title");
 
+    // Check for an active session. If found, redirect to the app page.
     if (localStorage.getItem('currentUser')) {
         window.location.href = '/app.html';
         return;
     }
 
-    // Show the sign-up form by default
-    signupForm.classList.add('active');
-
     showSigninLink.addEventListener('click', (e) => {
         e.preventDefault();
-        signupForm.classList.remove('active');
-        signinForm.classList.add('active');
+        signupForm.style.display = 'none';
+        signinForm.style.display = 'block';
         authTitle.textContent = "Sign In";
     });
 
     showSignupLink.addEventListener('click', (e) => {
         e.preventDefault();
-        signinForm.classList.remove('active');
-        signupForm.classList.add('active');
+        signinForm.style.display = 'none';
+        signupForm.style.display = 'block';
         authTitle.textContent = "Sign Up";
     });
 
@@ -81,6 +79,7 @@ const handleApplication = () => {
     const itemsContainer = document.getElementById("itemsContainer");
     const welcomeMessage = document.getElementById("welcome-message");
     const signoutBtn = document.getElementById("signoutBtn");
+    const myChatsBtn = document.getElementById("myChatsBtn");
     const imageInput = document.getElementById("imageInput");
     const titleInput = document.getElementById("title");
     const descriptionInput = document.getElementById("description");
@@ -109,6 +108,34 @@ const handleApplication = () => {
         window.location.href = '/index.html';
     });
     
+    myChatsBtn.addEventListener('click', async () => {
+        const chatsListContainer = document.getElementById('chatsListContainer');
+        const chatPartnersList = document.getElementById('chatPartnersList');
+        chatsListContainer.classList.toggle('hidden');
+
+        if (!chatsListContainer.classList.contains('hidden')) {
+            try {
+                const res = await fetch(`${API_URL}/my-chats/${currentUser.username}`);
+                const chatPartners = await res.json();
+                chatPartnersList.innerHTML = '';
+                if (chatPartners.length > 0) {
+                    chatPartners.forEach(partner => {
+                        const li = document.createElement('li');
+                        li.textContent = partner;
+                        li.addEventListener('click', () => {
+                            openChat(partner);
+                        });
+                        chatPartnersList.appendChild(li);
+                    });
+                } else {
+                    chatPartnersList.innerHTML = '<li>No active chats.</li>';
+                }
+            } catch (error) {
+                console.error("Error fetching chat partners:", error);
+            }
+        }
+    });
+
     imageInput.addEventListener('change', async (e) => {
         const file = e.target.files[0];
         if (!file) return;
@@ -196,7 +223,9 @@ const handleApplication = () => {
     async function openChat(sellerUsername) {
         chatContainer.classList.remove('hidden');
         chatUsername.textContent = sellerUsername;
+        chatContainer.dataset.seller = sellerUsername;
         messagesContainer.innerHTML = '';
+        document.getElementById('chatsListContainer').classList.add('hidden');
 
         const buyer = currentUser.username;
         const roomName = [buyer, sellerUsername].sort().join('_');
@@ -219,8 +248,8 @@ const handleApplication = () => {
     chatForm.addEventListener('submit', (e) => {
         e.preventDefault();
         const message = chatInput.value;
-        const receiver = chatUsername.textContent;
-        if (message) {
+        const receiver = chatContainer.dataset.seller;
+        if (message && receiver) {
             socket.emit('chatMessage', {
                 sender: currentUser.username,
                 receiver: receiver,
