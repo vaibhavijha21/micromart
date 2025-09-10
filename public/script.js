@@ -1,4 +1,5 @@
 const API_URL = "http://localhost:5000";
+const authFormsWrapper = document.getElementById("auth-forms");
 
 const handleAuthentication = () => {
     const signupForm = document.getElementById("signupForm");
@@ -108,7 +109,7 @@ const handleApplication = () => {
     const currentUser = JSON.parse(localStorage.getItem('currentUser'));
 
     if (!currentUser) {
-        window.location.href = '/index.html';
+        window.location.href = '/user.html';
         return;
     }
 
