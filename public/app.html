@@ -14,7 +14,8 @@
     <!-- Left Sidebar -->
     <div class="sidebar">
         <div class="sidebar-header">
-            <h2><i class="fas fa-recycle"></i> MicroMart</h2>
+            <img src="logo.jpg" alt="MicroMart logo" class="sidebar-logo">
+            <!-- <h2><i class="fas fa-recycle"></i> MicroMart</h2> -->
         </div>
         <nav class="sidebar-nav">
             <a href="#" class="nav-item active" data-section="home">
@@ -120,7 +121,24 @@
                     <h2>User Profile</h2>
                 </div>
                 <div class="profile-content">
-                    <p>Profile information will be displayed here.</p>
+                    <form id="profileForm" class="profile-form">
+                        <div class="form-row">
+                            <label for="profileUsername">Username</label>
+                            <input type="text" id="profileUsername" placeholder="Your username" required>
+                        </div>
+                        <div class="form-row">
+                            <label for="profileEmail">Email</label>
+                            <input type="email" id="profileEmail" placeholder="Your email" required>
+                        </div>
+                        <div class="form-row">
+                            <label for="profileLocation">Location</label>
+                            <input type="text" id="profileLocation" placeholder="City, Country">
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="top-btn">Save Profile</button>
+                        </div>
+                        <small id="profileSavedMsg" class="muted hidden">Profile saved.</small>
+                    </form>
                 </div>
             </div>
 
@@ -130,7 +148,18 @@
                     <h2>Settings</h2>
                 </div>
                 <div class="settings-content">
-                    <p>Settings options will be displayed here.</p>
+                    <div class="settings-row">
+                        <label for="themeToggle">Dark mode</label>
+                        <input type="checkbox" id="themeToggle">
+                    </div>
+                    <div class="settings-row">
+                        <label for="notifToggle">Enable notifications</label>
+                        <input type="checkbox" id="notifToggle">
+                    </div>
+                    <div class="form-actions">
+                        <button id="saveSettingsBtn" class="top-btn">Save Settings</button>
+                    </div>
+                    <small id="settingsSavedMsg" class="muted hidden">Settings saved.</small>
                 </div>
             </div>
         </div>
@@ -145,9 +174,7 @@
             <button id="closePostModal" class="close-btn">&times;</button>
         </div>
         <form id="itemForm">
-            <p class="custom-file-upload">
-                Upload an Image
-            </p>
+            <label for="imageInput" class="custom-file-upload">Upload an Image</label>
             <input type="file" id="imageInput" accept="image/*">
             <div id="loading-message" class="hidden modern-loader">
                 <span class="loader"></span>
@@ -162,6 +189,7 @@
                 <option value="plastic">Plastic</option>
                 <option value="paper">Paper</option>
             </select>
+            <input type="text" id="location" placeholder="Location (e.g., City)">
             <input type="hidden" id="imageUrl">
             <button type="submit">Post Item</button>
         </form>

@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:5000";
+const API_URL = (typeof window !== 'undefined' && window.location && window.location.origin) ? window.location.origin : "http://localhost:5000";
 const authFormsWrapper = document.getElementById("auth-forms");
 
 const handleAuthentication = () => {
@@ -115,9 +115,78 @@ const handleApplication = () => {
 
     welcomeMessage.textContent = currentUser.username;
 
+    // ---- Profile helpers ----
+    function loadProfileIntoForm() {
+        const form = document.getElementById('profileForm');
+        if (!form) return;
+        const usernameInput = document.getElementById('profileUsername');
+        const emailInput = document.getElementById('profileEmail');
+        const locationInputProf = document.getElementById('profileLocation');
+        const stored = JSON.parse(localStorage.getItem('profile:'+currentUser.username) || 'null');
+        usernameInput.value = (stored?.username) || currentUser.username || '';
+        emailInput.value = (stored?.email) || currentUser.email || '';
+        locationInputProf.value = (stored?.location) || '';
+    }
+
+    function setupProfileFormHandlers() {
+        const form = document.getElementById('profileForm');
+        if (!form) return;
+        const savedMsg = document.getElementById('profileSavedMsg');
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const username = document.getElementById('profileUsername').value.trim();
+            const email = document.getElementById('profileEmail').value.trim();
+            const locationVal = document.getElementById('profileLocation').value.trim();
+            const profile = { username, email, location: locationVal };
+            localStorage.setItem('profile:'+currentUser.username, JSON.stringify(profile));
+            if (savedMsg) { savedMsg.classList.remove('hidden'); setTimeout(()=>savedMsg.classList.add('hidden'), 1200); }
+            // reflect username in welcome if changed locally
+            const displayName = username || currentUser.username;
+            const welcome = document.getElementById('welcome-message');
+            if (welcome) welcome.textContent = displayName;
+        });
+    }
+
+    // ---- Settings helpers ----
+    function loadSettingsIntoControls() {
+        const themeToggle = document.getElementById('themeToggle');
+        const notifToggle = document.getElementById('notifToggle');
+        const settings = JSON.parse(localStorage.getItem('settings:'+currentUser.username) || 'null') || {};
+        if (themeToggle) themeToggle.checked = settings.darkMode === true;
+        if (notifToggle) notifToggle.checked = settings.notifications === true;
+        applyTheme(settings.darkMode === true);
+    }
+
+    function setupSettingsHandlers() {
+        const saveBtn = document.getElementById('saveSettingsBtn');
+        const savedMsg = document.getElementById('settingsSavedMsg');
+        if (!saveBtn) return;
+        saveBtn.addEventListener('click', () => {
+            const themeToggle = document.getElementById('themeToggle');
+            const notifToggle = document.getElementById('notifToggle');
+            const settings = {
+                darkMode: !!(themeToggle && themeToggle.checked),
+                notifications: !!(notifToggle && notifToggle.checked)
+            };
+            localStorage.setItem('settings:'+currentUser.username, JSON.stringify(settings));
+            applyTheme(settings.darkMode);
+            if (savedMsg) { savedMsg.classList.remove('hidden'); setTimeout(()=>savedMsg.classList.add('hidden'), 1200); }
+        });
+    }
+
+    function applyTheme(isDark) {
+        document.body.classList.toggle('dark', !!isDark);
+    }
+
     // Sidebar navigation
     navItems.forEach(item => {
         item.addEventListener('click', (e) => {
+            // Allow external links (e.g., Requests page) to navigate normally
+            if (item.dataset.external === 'true') {
+                const href = item.getAttribute('href') || '/request.html';
+                window.location.href = href;
+                return;
+            }
             e.preventDefault();
             const section = item.dataset.section;
             
@@ -148,6 +217,14 @@ const handleApplication = () => {
                 if (section === 'chats') {
                     console.log('Loading chat partners for inline chat');
                     loadChatPartnersInline();
+                }
+
+                // Populate profile/settings when entering their sections
+                if (section === 'profile') {
+                    loadProfileIntoForm();
+                }
+                if (section === 'settings') {
+                    loadSettingsIntoControls();
                 }
             }
         });
@@ -345,7 +422,7 @@ const handleApplication = () => {
         const title = titleInput.value;
         const description = descriptionInput.value;
         const category = categoryInput.value;
-        const location = locationInput.value;
+        const location = locationInput ? locationInput.value : '';
         const imageUrl = imageUrlInput.value;
         const postedBy = currentUser.username;
 
@@ -387,7 +464,7 @@ const handleApplication = () => {
                     div.className = "item";
                     const username = item.postedBy ? item.postedBy : 'Unknown User';
                     const category = item.category || 'plastic'; // Default fallback for existing items
-                    const location = item.location || 'Unknown Location';
+                    const location = item.location || '';
                     const imgSrc = (() => {
                         let url = item.imageUrl || '';
                         if (!url || url === 'no') return '';
@@ -406,10 +483,7 @@ const handleApplication = () => {
                         <div class="item-category">
                             <span class="category-badge category-${category}">${category.charAt(0).toUpperCase() + category.slice(1)}</span>
                         </div>
-                        <div class="item-location">
-                            <i class="fas fa-map-marker-alt"></i>
-                            <span>${location}</span>
-                        </div>
+                        ${location ? `<div class=\"item-location\">\n                            <i class=\"fas fa-map-marker-alt\"></i>\n                            <span>${location}</span>\n                        </div>` : ''}
                         ${imgSrc ? `<img src="${imgSrc}" alt="${item.title}" loading="lazy">` : ""}
                         <p>Posted by: ${username}</p>
                         <small>${new Date(item.createdAt).toLocaleString()}</small>
@@ -568,6 +642,8 @@ const handleApplication = () => {
     
     getItems();
     populateLocationFilter();
+    setupProfileFormHandlers();
+    setupSettingsHandlers();
 };
 
 const handleChatPage = () => {
@@ -672,7 +748,11 @@ const handleChatPage = () => {
 
 document.addEventListener('DOMContentLoaded', () => {
     const path = window.location.pathname;
-    if (path === '/' || path === '/index.html') {
+    if (path === '/') {
+        // Start site from landing page
+        window.location.replace('/landing.html');
+        return;
+    } else if (path === '/index.html') {
         handleAuthentication();
     } else if (path === '/app.html') {
         handleApplication();
