@@ -3,24 +3,1370 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <title>Document</title>
+    <title>Micromart - Turn Scrap Into Value</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.7.4/lottie.min.js"></script>
+
+    <style>
+        :root {
+           --primary: #082D34;         /* Deep blue (background) */
+    --primary-dark: #061f23;    /* Even darker blue */
+    --secondary: #D6E8AA;       /* Light green (accents) */
+    --dark: #F1F8DD;            /* Very light green (text) */
+    --dark-light: #E8F3C9;      /* Lighter green */
+    --light: #082D34;           /* Use deep blue as background */
+    --gray: #B0C4B1;            /* Muted greenish gray */
+    --gray-light: #D6E8AA;      /* Light green for borders, etc. */
+    --accent: #F1F8DD;          /* Use light green as accent */
+    --radius: 12px;
+    --shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+           font-family: 'Inter', sans-serif;
+    color: var(--dark);
+    background-color: var(--primary);
+    line-height: 1.6;
+    overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        header {
+             background-color: var(--primary-dark);
+             color: var(--dark);
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            transition: var(--transition);
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+        }
+
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            font-size: 28px;
+            color:var(--secondary);
+            display: flex;
+            align-items: center;
+        }
+
+        /* .logo span {
+            color: var(--secondary);
+        } */
+
+        .logo-icon {
+            margin-right: 10px;
+            font-size: 32px;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        nav a:after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            transition: var(--transition);
+        }
+
+        nav a:hover:after {
+            width: 100%;
+        }
+
+        nav a:hover {
+            color:#2d7782 ;
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 8px 18px;
+            border-radius: var(--radius);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: var(--transition);
+        }
+
+        .btn:hover:before {
+            left: 100%;
+        }
+
+        .btn-outline {
+               border: 2px solid #b5e95b;
+    color: #a2cd58;
+    background: transparent;
+        }
+
+        .btn-outline:hover {
+             background: var(--secondary);
+    color: var(--primary);
+    transform: translateY(-2px);
+        }
+
+        .btn-primary {
+          background: var(--secondary);
+    color: var(--primary);
+    border: 2px solid var(--secondary);
+        }
+
+        .btn-primary:hover {
+           background: #bcd98b;
+    border-color: #bcd98b;
+    color: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background: var(--secondary);
+            color: white;
+            border: 2px solid var(--secondary);
+        }
+
+        .btn-secondary:hover {
+            background: #00BB77;
+            border-color: #00BB77;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 204, 136, 0.3);
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 120px 0 100px;
+            background: #e8f2d7;
+            position: relative;
+            overflow: hidden;
+            color: #082D34;
+        }
+
+        .hero-content {
+            max-width: 600px;
+            z-index: 2;
+            position: relative;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            line-height: 1.2;
+            font-family: 'Playfair Display', serif;
+            color: #082D34;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--gray);
+            margin-bottom: 40px;
+             color: #333;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 60px;
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 40px;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            color:#082D34;
+            font-size: 0.9rem;
+        }
+
+        .hero-image {
+            position: absolute;
+            right: 0;
+            bottom: 0;
+            width: 50%;
+            max-width: 600px;
+            z-index: 1;
+               }
+
+        /* Video Demo Section */
+        .video-demo {
+            padding: 40px 0;
+            background: #e8f2d7;
+            text-align: center;
+        }
+
+        .video-container {
+            position: relative;
+            max-width: 800px;
+            margin: 0 auto;
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transform: translateY(50px);
+            opacity: 0;
+            transition: all 0.8s ease;
+        }
+
+        .video-container.animated {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .video-placeholder {
+            width: 100%;
+            height: 450px;
+            background: linear-gradient(45deg, #1A2233, #2A3345);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .video-placeholder:before {
+            content: '';
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            background: var(--primary);
+            border-radius: 50%;
+            z-index: 1;
+            transition: var(--transition);
+        }
+
+        .video-placeholder:after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-top: 15px solid transparent;
+            border-bottom: 15px solid transparent;
+            border-left: 25px solid white;
+            z-index: 2;
+            margin-left: 5px;
+        }
+
+        .video-placeholder:hover:before {
+            transform: scale(1.1);
+        }
+
+        /* Features Section */
+        .features {
+            padding: 40px 0;
+            background: #e8f2d7;
+            color: #082D34;
+            
+        }
+
+        .section-header {
+            text-align: center;
+            max-width: 700px;
+            margin: 0 auto 60px;
+        }
+        .process .section-subtitle {
+    color: var(--gray-light);
+}
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            font-family: 'Playfair Display', serif;
+            position: relative;
+            display: inline-block;
+            color: #082D34;
+               /* color: #082D34; */
+        }
+
+        .section-title:after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: var(--primary);
+        }
+
+        .section-subtitle {
+             /* color: var(--gray-light); */
+           color:#082D34;
+            font-size: 1.1rem;
+            
+        }
+        
+           .light-title {
+    color: var(--gray-light); /* Or any lighter color you prefer, like #D6E8AA */
+         }
+
+
+        .video-demo .video-sub{
+            color:#082D34;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+        }
+
+        .feature-card {
+            background:  var(--primary-dark);
+            /* border-radius: var(--radius); */
+            color: var(--dark);
+              border: none;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 0;
+            /* background: var(--primary); */
+            transition: var(--transition);
+            background: var(--secondary);
+        }
+
+        .feature-card:hover:before {
+            height: 100%;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .feature-icon {
+            width: 70px;
+            height: 70px;
+            /* background: rgba(0, 102, 255, 0.1); */
+             background: rgba(8, 45, 52, 0.5);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 25px;
+            transition: var(--transition);
+        }
+
+        .feature-card:hover .feature-icon {
+            background: var(--primary);
+            transform: rotateY(180deg);
+        }
+
+        .feature-card:hover .feature-icon i {
+            color: white;
+        }
+
+        .feature-icon i {
+            font-size: 28px;
+            /* color: var(--primary); */
+            transition: var(--transition);
+            color: var(--dark-light)
+        }
+
+        .feature-title {
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .feature-desc {
+            color: var(--gray);
+        }
+
+        /* Animated Process Section */
+        .process {
+            padding: 100px 0;
+            background: linear-gradient(135deg, #1A2233 0%, #2A3345 100%);
+            color: white;
+            position: relative;
+        }
+
+        .process-container {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            margin-top: 60px;
+        }
+
+        .process-step {
+            text-align: center;
+            position: relative;
+            width: 23%;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+        }
+
+        .process-step.animated {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .process-step:nth-child(2) {
+            transition-delay: 0.2s;
+        }
+
+        .process-step:nth-child(3) {
+            transition-delay: 0.4s;
+        }
+
+        .process-step:nth-child(4) {
+            transition-delay: 0.6s;
+        }
+
+        .step-icon {
+            width: 80px;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .step-icon i {
+            font-size: 30px;
+            color: white;
+        }
+
+        .step-number {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            width: 30px;
+            height: 30px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+
+        .step-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .step-desc {
+            font-size: 0.9rem;
+            color: var(--gray-light);
+        }
+
+        .process-connector {
+            position: absolute;
+            top: 40px;
+            left: 20%;
+            width: 60%;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .process-connector:before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: 0;
+            width: 0;
+            height: 6px;
+            background:#d5eab0;
+            border-radius: 3px;
+            transition: width 1.5s ease-in-out;
+        }
+
+        .process-connector.animated:before {
+            width: 100%;
+        }
+
+        /* Categories Section */
+        .categories {
+            padding: 100px 0;
+            background:#e8f2d7;
+            color: #082D34;
+        }
+
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+
+        .category-card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 25px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .category-card:before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 0;
+            background: var(--primary);
+            opacity: 0.5;
+            transition: var(--transition);
+        }
+
+        .category-card:hover:before {
+            height: 100%;
+        }
+
+        .category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .category-icon {
+            width: 60px;
+            height: 60px;
+            background: rgba(0, 204, 136, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            transition: var(--transition);
+        }
+
+        .category-card:hover .category-icon {
+            background: var(--secondary);
+            transform: scale(1.1);
+        }
+
+        .category-card:hover .category-icon i {
+            color: white;
+        }
+
+        .category-icon i {
+            font-size: 24px;
+            color: var(--secondary);
+            transition: var(--transition);
+        }
+
+        .category-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .category-desc {
+            font-size: 0.9rem;
+           color: var(--primary);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Testimonials */
+        .testimonials {
+            padding: 100px 0;
+            background: white;
+            color: #082D34;
+        }
+
+        .testimonials-container {
+            display: flex;
+            gap: 30px;
+            overflow-x: auto;
+            padding: 20px 0;
+            scrollbar-width: thin;
+        }
+
+        .testimonial-card {
+            flex: 0 0 350px;
+            background: white;
+            border-radius: var(--radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            margin-left: 16px;
+        }
+
+        .testimonial-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .testimonial-text {
+            font-style: italic;
+            margin-bottom: 20px;
+              color:#99c74a;
+            position: relative;
+        }
+
+        .testimonial-text:before, .testimonial-text:after {
+            content: '"';
+            font-size: 3rem;
+            color: var(--gray-light);
+            position: absolute;
+            line-height: 1;
+        }
+
+        .testimonial-text:before {
+            top: -10px;
+            left: -15px;
+        }
+
+        .testimonial-text:after {
+            bottom: -30px;
+            right: -15px;
+        }
+
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .author-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--gray-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .author-name {
+            font-weight: 600;
+        }
+
+        .author-title {
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+
+        /* CTA Section */
+        .cta {
+            padding: 100px 0;
+            background: linear-gradient(135deg, #1A2233 0%, #2A3345 100%);
+            color: white;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100" opacity="0.05"><circle cx="50" cy="50" r="40" fill="white"/></svg>');
+            background-size: 300px 300px;
+            animation: floating 20s linear infinite;
+        }
+
+        .cta .section-title {
+            color: white;
+        }
+
+        .cta .section-title:after {
+            background: var(--secondary);
+        }
+
+        .cta .section-subtitle {
+            color: var(--gray-light);
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 40px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--primary-dark);
+            color: var(--secondary);
+            padding: 80px 0 40px;
+            position: relative;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 40px;
+            margin-bottom: 60px;
+        }
+
+        .footer-column h3 {
+            font-size: 1.2rem;
+            margin-bottom: 25px;
+            font-weight: 600;
+            position: relative;
+            display: inline-block;
+        }
+
+        .footer-column h3:after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 30px;
+            height: 2px;
+            background: var(--primary);
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 15px;
+        }
+
+        .footer-links a {
+            color: var(--gray-light);
+            text-decoration: none;
+            transition: var(--transition);
+            display: inline-block;
+        }
+
+        .footer-links a:hover {
+            color: white;
+            transform: translateX(5px);
+        }
+
+        .footer-bottom {
+            border-top: 1px solid var(--dark-light);
+            padding-top: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-social {
+            display: flex;
+            gap: 20px;
+        }
+
+        .footer-social a {
+            color: var(--gray-light);
+            font-size: 1.2rem;
+            transition: var(--transition);
+        }
+
+        .footer-social a:hover {
+            color: white;
+            transform: translateY(-3px);
+        }
+
+        .copyright {
+            color: var(--gray-light);
+            font-size: 0.9rem;
+        }
+
+        /* Animations */
+        @keyframes floating {
+            0% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+            100% {
+                transform: translate(-300px, -300px) rotate(360deg);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .features-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .categories-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .footer-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .hero h1 {
+                font-size: 2.8rem;
+                color: #082D34;
+            }
+            
+            .process-container {
+                flex-direction: column;
+                align-items: center;
+                gap: 40px;
+            }
+            
+            .process-step {
+                width: 100%;
+                max-width: 300px;
+            }
+            
+            .process-connector {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            nav {
+                display: none;
+            }
+            
+            .hero-content {
+                text-align: center;
+                max-width: 100%;
+            }
+            
+            .hero-buttons {
+                justify-content: center;
+            }
+            
+            .hero-stats {
+                justify-content: center;
+            }
+            
+            .hero-image {
+                display: none;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .categories-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .footer-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .footer-bottom {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+            
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
 </head>
-<style>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container header-container">
+            <div class="logo">
+                <i class="fas fa-recycle logo-icon"></i>
+                Micro<span>mart</span>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">Marketplace</a></li>
+                    <li><a href="#">How It Works</a></li>
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="#">Contact</a></li>
+                </ul>
+            </nav>
+            <div class="auth-buttons">
+                <a href="index.html" class="btn btn-outline">Get Started</a>
+            </div>
+        </div>
+    </header>
 
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1 class="animate_animated animate_fadeInDown">Turn Scrap Into Value<br>The Modern Way to Recycle</h1>
+                <p class="animate_animated animatefadeIn animate_delay-1s">Join the sustainable marketplace that makes recycling profitable, easy, and environmentally impactful.</p>
+                <div class="hero-buttons animate_animated animatefadeIn animate_delay-2s">
+                    <a href="#" class="btn btn-primary">Start Selling</a>
+                    <a href="#" class="btn btn-outline">Browse Marketplace</a>
+                </div>
+                <div class="hero-stats animate_animated animatefadeIn animate_delay-3s">
+                    <div class="stat-item">
+                        <span class="stat-value" id="stat1">0</span>
+                        <span class="stat-label">Items Listed</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="stat2">0</span>
+                        <span class="stat-label">Active Users</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="stat3">0</span>
+                        <span class="stat-label">Tons Recycled</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="hero-image">
+            <svg viewBox="0 0 600 400" xmlns="http://www.w3.org/2000/svg">
+                <path d="M400,200 C400,267 345,320 275,320 C205,320 150,267 150,200 C150,133 205,80 275,80 C345,80 400,133 400,200 Z" fill="v#e8f2d7"/>
+                <path d="M300,120 L320,180 L380,200 L320,220 L300,280 L280,220 L220,200 L280,180 L300,120 Z" fill="var(--secondary)"/>
+                <circle cx="275" cy="200" r="30" fill="var(--primary)"/>
+                <path d="M450,250 C450,300 410,340 360,340 C310,340 270,300 270,250 C270,200 310,160 360,160 C410,160 450,200 450,250 Z" fill="var(--dark-light)"/>
+                <rect x="330" y="190" width="60" height="60" rx="10" fill="var(--primary)"/>
+                <path d="M150,300 C150,335 180,365 215,365 C250,365 280,335 280,300 C280,265 250,235 215,235 C180,235 150,265 150,300 Z" fill="var(--dark-light)"/>
+                <circle cx="215" cy="300" r="25" fill="var(--primary)"/>
+            </svg>
+        </div>
+    </section>
 
-</style>
-<body class="bg-[#082d34]">
-    <div class="flex flex-col items-center w-full mt-4">
-        <navbar class="w-1/4 p-2 flex justify-center gap-3 rounded-lg border-2 items-center mx-auto">
-            <p class="hover:bg-black hover:text-white cursor-pointer rounded-lg px-3 py-1 transition-colors">Home</p>
-            <p class="hover:bg-black hover:text-white cursor-pointer rounded-lg px-3 py-1 transition-colors">About</p>
-            <p class="hover:bg-black hover:text-white cursor-pointer rounded-lg px-3 py-1 transition-colors">Contact</p>
-            <p class="hover:bg-black hover:text-white cursor-pointer rounded-lg px-3 py-1 transition-colors">Sign in</p>
-        </navbar>
-    </div>
-</body>
-    <footer class="fixed bottom-0 left-0 w-full bg-black text-white text-center py-3 rounded-t-lg shadow-lg z-50">
-        &copy; 2025 Micromart. All rights reserved.
+    <!-- Video Demo Section -->
+    <section class="video-demo">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">See Micromart in Action</h2>
+                <p class="section-subtitle video-sub " >Watch how our AI-powered platform transforms scrap into valuable resources</p>
+            </div>
+            <div class="video-container" id="video-container">
+                <div class="video-placeholder" id="video-placeholder">
+                    <h3>Click to play demo video</h3>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Why Choose Micromart</h2>
+                <p class="section-subtitle " >Our platform combines cutting-edge technology with sustainable practices to revolutionize recycling</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <h3 class="feature-title">AI Material Recognition</h3>
+                    <p class="feature-desc">Our advanced AI automatically identifies materials and components from photos, providing instant valuation.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3 class="feature-title">Integrated Chat System</h3>
+                    <p class="feature-desc">Communicate with buyers and sellers in real-time through our secure, built-in messaging platform.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-globe"></i>
+                    </div>
+                    <h3 class="feature-title">Personalized Dashboard</h3>
+                    <p class="feature-desc">Manage your listings, track your chats, and update your profile all from one central dashboard.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3 class="feature-title">Discover Valuable Scrap</h3>
+                    <p class="feature-desc">Our platform helps you find and sell valuable materials by filtering your location</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-shipping-fast"></i>
+                    </div>
+                    <h3 class="feature-title">Easy Logistics</h3>
+                    <p class="feature-desc">We handle pickup and delivery logistics, making the process seamless for both buyers and sellers.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <h3 class="feature-title">Request Specific Materials</h3>
+                    <p class="feature-desc">Can't find what you need? Use our request feature to let sellers know exactly what you're looking for.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Animated Process Section -->
+    <section class="process">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title light-title">How Micromart Works</h2>
+                <p class="section-subtitle ">Our simple four-step process makes recycling profitable and effortless</p>
+            </div>
+            <div class="process-container">
+                <div class="process-step" id="step1">
+                    <div class="step-icon">
+                        <i class="fas fa-camera"></i>
+                        <div class="step-number">1</div>
+                    </div>
+                    <h3 class="step-title">Snap a Photo</h3>
+                    <p class="step-desc">Take pictures of your scrap items using our AI-powered app</p>
+                </div>
+                <div class="process-step" id="step2">
+                    <div class="step-icon">
+                        <i class="fas fa-search"></i>
+                        <div class="step-number">2</div>
+                    </div>
+                    <h3 class="step-title">AI Analysis</h3>
+                    <p class="step-desc">Our technology identifies materials and estimates value</p>
+                </div>
+                <div class="process-step" id="step3">
+                    <div class="step-icon">
+                        <i class="fas fa-tags"></i>
+                        <div class="step-number">3</div>
+                    </div>
+                    <h3 class="step-title">Get Offers</h3>
+                    <p class="step-desc">Receive real-time offers from verified buyers worldwide</p>
+                </div>
+                <div class="process-step" id="step4">
+                    <div class="step-icon">
+                        <i class="fas fa-shipping-fast"></i>
+                        <div class="step-number">4</div>
+                    </div>
+                    <h3 class="step-title">Get Paid</h3>
+                    <p class="step-desc">We handle logistics and you receive payment securely</p>
+                </div>
+                <div class="process-connector" id="process-connector"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Categories Section -->
+    <section class="categories">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Popular Categories</h2>
+                <p class="section-subtitle">Find valuable materials across diverse categories of recyclable items</p>
+            </div>
+            <div class="categories-grid">
+                <div class="category-card">
+                    <div class="category-icon">
+                        <i class="fas fa-laptop"></i>
+                    </div>
+                    <h3 class="category-title">Electronics</h3>
+                    <p class="category-desc">Computers, phones, and components with precious metals</p>
+                </div>
+                <div class="category-card">
+                    <div class="category-icon">
+                        <i class="fas fa-cogs"></i>
+                    </div>
+                    <h3 class="category-title">Mechanical</h3>
+                    <p class="category-desc">Motors, machinery, and automotive parts</p>
+                </div>
+                <div class="category-card">
+                    <div class="category-icon">
+                        <i class="fas fa-plug"></i>
+                    </div>
+                    <h3 class="category-title">Appliances</h3>
+                    <p class="category-desc">Household appliances and HVAC systems</p>
+                </div>
+                <div class="category-card">
+                    <div class="category-icon">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <h3 class="category-title">Electrical</h3>
+                    <p class="category-desc">Wiring, transformers, and power supplies</p>
+                </div>
+                <div class="category-card">
+                    <div class="category-icon">
+                        <i class="fas fa-wine-bottle"></i>
+                    </div>
+                    <h3 class="category-title">Plastics</h3>
+                    <p class="category-desc">Engineering plastics and recyclable polymers</p>
+                </div>
+                <div class="category-card">
+                    <div class="category-icon">
+                        <i class="fas fa-industry"></i>
+                    </div>
+                    <h3 class="category-title">Industrial</h3>
+                    <p class="category-desc">Manufacturing byproducts and surplus materials</p>
+                </div>
+                <div class="category-card">
+                    <div class="category-icon">
+                        <i class="fas fa-tools"></i>
+                    </div>
+                    <h3 class="category-title">Tools</h3>
+                    <p class="category-desc">Professional and DIY tools and equipment</p>
+                </div>
+                <div class="category-card">
+                    <div class="category-icon">
+                        <i class="fas fa-ellipsis-h"></i>
+                    </div>
+                    <h3 class="category-title">More</h3>
+                    <p class="category-desc">Explore additional categories and materials</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="testimonials">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">What Our Users Say</h2>
+                <p class="section-subtitle">Hear from our community of eco-conscious sellers and buyers</p>
+            </div>
+            <div class="testimonials-container">
+                <div class="testimonial-card">
+                    <p class="testimonial-text">"I've made over ₹3,200 in just four months by clearing out old electronics from my workshop. The AI valuation made it so easy to post item correctly."</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">MS</div>
+                        <div>
+                            <div class="author-name">Madhav Sharma</div>
+                            <div class="author-title">Electronics Engineer</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <p class="testimonial-text">"As a small manufacturing business, we generate scrap metal regularly. Micromart has helped us turn waste into revenue while tracking our sustainability goals."</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">MR</div>
+                        <div>
+                            <div class="author-name">Mohit Rana</div>
+                            <div class="author-title">Operations Manager</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <p class="testimonial-text">"The interactive component visualizer is incredible! Buyers can see exactly what they're purchasing, which builds trust and eliminates guesswork."</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">TS</div>
+                        <div>
+                            <div class="author-name">Taniya Sarao</div>
+                            <div class="author-title">Student </div>
+                        </div>
+                    </div>
+                </div>
+              
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Ready to Turn Scrap into Value?</h2>
+                <p class="section-subtitle">Join thousands of users already benefiting from modern recycling</p>
+            </div>
+            <div class="cta-buttons">
+                <a href="index.html" class="btn btn-secondary">Create Account</a>
+                <a href="#" class="btn btn-outline" style="color: white; border-color: white;">Learn More</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-column">
+                    <h3>Micromart</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">How It Works</a></li>
+                        <li><a href="#">Careers</a></li>
+                        <li><a href="#">Press</a></li>
+                        <li><a href="#">Impact Report</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Resources</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Help Center</a></li>
+                        <li><a href="#">Blog</a></li>
+                        <li><a href="#">Pricing Guide</a></li>
+                        <li><a href="#">Recycling Tips</a></li>
+                        <li><a href="#">Material Values</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Legal</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Terms of Service</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Cookie Policy</a></li>
+                        <li><a href="#">Data Processing</a></li>
+                        <li><a href="#">Security</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Connect</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Twitter</a></li>
+                        <li><a href="#">LinkedIn</a></li>
+                        <li><a href="#">Instagram</a></li>
+                        <li><a href="#">Facebook</a></li>
+                        <li><a href="#">Newsletter</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <div class="footer-social">
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-linkedin"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                </div>
+                <div class="copyright">© 2023 Micromart. All rights reserved.</div>
+            </div>
+        </div>
     </footer>
+
+    <script>
+        // Animated counter for statistics
+        function animateCounter(elementId, finalValue, duration) {
+            let startTime = null;
+            const element = document.getElementById(elementId);
+            const initialValue = 0;
+            
+            function updateCounter(timestamp) {
+                if (!startTime) startTime = timestamp;
+                const progress = Math.min((timestamp - startTime) / duration, 1);
+                const currentValue = Math.floor(progress * (finalValue - initialValue) + initialValue);
+                element.textContent = currentValue.toLocaleString();
+                
+                if (progress < 1) {
+                    window.requestAnimationFrame(updateCounter);
+                } else {
+                    element.textContent = finalValue.toLocaleString();
+                }
+            }
+            
+            window.requestAnimationFrame(updateCounter);
+        }
+        
+        // Start counters when the page loads
+        window.addEventListener('load', function() {
+            animateCounter('stat1', 25479, 2000);
+            animateCounter('stat2', 18642, 2000);
+            animateCounter('stat3', 542, 2000);
+            
+            // Animate video container on scroll
+            const videoContainer = document.getElementById('video-container');
+            const processSteps = document.querySelectorAll('.process-step');
+            const processConnector = document.getElementById('process-connector');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        videoContainer.classList.add('animated');
+                    }
+                });
+            }, { threshold: 0.5 });
+            
+            observer.observe(videoContainer);
+            
+            // Animate process steps on scroll
+            const processObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        processSteps.forEach(step => {
+                            step.classList.add('animated');
+                        });
+                        processConnector.classList.add('animated');
+                    }
+                });
+            }, { threshold: 0.5 });
+            
+            processObserver.observe(document.querySelector('.process'));
+        });
+        
+        // Video placeholder click handler
+        document.getElementById('video-placeholder').addEventListener('click', function() {
+            alert('Video player would launch with a professional demonstration of the Micromart platform. In a real implementation, this would play a professionally produced video showcasing the platform features.');
+        });
+    </script>
+</body>
 </html>
