@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Create Request - MicroMart</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+<div class="app-layout">
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2><i class="fas fa-recycle"></i> MicroMart</h2>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="/app.html" class="nav-item" data-external="true">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </a>
+            <a href="/app.html" class="nav-item" data-external="true">
+                <i class="fas fa-comments"></i>
+                <span>Chat</span>
+            </a>
+            <a href="/request.html" class="nav-item active" data-external="true">
+                <i class="fas fa-hand-paper"></i>
+                <span>Requests</span>
+            </a>
+            <a href="/app.html" class="nav-item" data-external="true">
+                <i class="fas fa-user"></i>
+                <span>User</span>
+            </a>
+            <a href="/app.html" class="nav-item" data-external="true">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <div class="top-bar">
+            <div class="top-bar-left">
+                <div class="welcome-card enhanced-welcome-card">
+                    <div class="welcome-card-row">
+                        <div class="welcome-avatar">
+                            <i class="fas fa-user-circle"></i>
+                        </div>
+                        <div class="welcome-card-content">
+                            <span class="welcome-title">Welcome back,</span>
+                            <span class="welcome-username" id="welcome-message"></span>
+                        </div>
+                        <div class="welcome-card-badge">
+                            <i class="fas fa-leaf"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="top-bar-right">
+                <button id="cancelRequest" class="top-btn">
+                    <i class="fas fa-arrow-left"></i> Back
+                </button>
+                <button id="signoutBtn" class="top-btn signout">
+                    <i class="fas fa-sign-out-alt"></i> Sign Out
+                </button>
+            </div>
+        </div>
+
+        <div class="content-sections" style="padding: 16px;">
+            <div class="content-section active">
+                <div class="requests-layout" style="display:flex; gap:24px; align-items:flex-start;">
+                    <!-- Left: Create Request Form -->
+                    <div class="request-form-panel" style="flex:1; min-width:320px;">
+                        <div class="section-header">
+                            <h2>Request Details</h2>
+                        </div>
+                        <form id="requestForm" class="request-form">
+                            <input type="text" name="requestTitle" placeholder="Request Title" required>
+                            <textarea name="requestDescription" placeholder="Describe what you need" required></textarea>
+                            <div style="display:flex; gap:12px;">
+                                <select name="requestCategory" required style="flex:1;">
+                                    <option value="">Select Category</option>
+                                    <option value="electronic">Electronic</option>
+                                    <option value="metal">Metal</option>
+                                    <option value="plastic">Plastic</option>
+                                    <option value="paper">Paper</option>
+                                    <option value="other">Other</option>
+                                </select>
+                                <input type="text" name="requestLocation" placeholder="Location (optional)" style="flex:1;">
+                            </div>
+                            <button type="submit" class="top-btn" style="align-self:flex-start"><i class="fas fa-paper-plane"></i> Post Request</button>
+                        </form>
+                    </div>
+
+                    <!-- Right: Recent Requests -->
+                    <div class="requests-list-panel" style="flex:1.2; min-width:360px;">
+                        <div class="section-header" style="display:flex; align-items:center; justify-content:space-between;">
+                            <h2 style="margin:0;">Recent Requests</h2>
+                            <span id="requestsCount" class="category-badge category-paper" style="font-size:12px;">0</span>
+                        </div>
+                        <div class="search-container" style="margin-bottom:12px;">
+                            <div class="search-box">
+                                <i class="fas fa-search"></i>
+                                <input type="text" id="requestSearchInput" placeholder="Search requests...">
+                            </div>
+                        </div>
+                        <div style="display:flex; gap:12px; margin-bottom:12px;">
+                            <select id="requestCategoryFilter" style="flex:1;">
+                                <option value="all">All Categories</option>
+                                <option value="electronic">Electronic</option>
+                                <option value="metal">Metal</option>
+                                <option value="plastic">Plastic</option>
+                                <option value="paper">Paper</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div id="requestsList" class="items-grid"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="script.js"></script>
+
+</body>
+</html>
+
+
+

@@ -8,7 +8,7 @@
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-<body>
+<body style="background-color:#082D34">
 
 <div class="app-layout">
     <!-- Left Sidebar -->
@@ -24,6 +24,10 @@
             <a href="#" class="nav-item" data-section="chats">
                 <i class="fas fa-comments"></i>
                 <span>Chat</span>
+            </a>
+            <a href="/request.html" class="nav-item" data-external="true">
+                <i class="fas fa-hand-paper"></i>
+                <span>Requests</span>
             </a>
             <a href="#" class="nav-item" data-section="profile">
                 <i class="fas fa-user"></i>
@@ -41,7 +45,20 @@
         <!-- Top Bar -->
         <div class="top-bar">
             <div class="top-bar-left">
-                <span class="welcome-text">Welcome <span id="welcome-message"></span></span>
+                <div class="welcome-card enhanced-welcome-card">
+                    <div class="welcome-card-row">
+                        <div class="welcome-avatar">
+                            <i class="fas fa-user-circle"></i>
+                        </div>
+                        <div class="welcome-card-content">
+                            <span class="welcome-title">Welcome back,</span>
+                            <span class="welcome-username" id="welcome-message"></span>
+                        </div>
+                        <div class="welcome-card-badge">
+                            <i class="fas fa-leaf"></i>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="top-bar-right">
                 <button id="postItemBtn" class="top-btn">
@@ -69,7 +86,7 @@
             <!-- Home Section -->
             <div id="home-section" class="content-section active">
                 <div class="section-header">
-                    <h2>All Items</h2>
+                    <h2 id="h2">All Items</h2>
                 </div>
                 <div id="itemsContainer" class="items-grid"></div>
             </div>
@@ -132,9 +149,19 @@
                 Upload an Image
             </p>
             <input type="file" id="imageInput" accept="image/*">
-            <p id="loading-message" class="hidden">Analyzing image...</p>
+            <div id="loading-message" class="hidden modern-loader">
+                <span class="loader"></span>
+                <span class="loader-text">Analyzing image...</span>
+            </div>
             <input type="text" id="title" placeholder="Item Title" required>
             <textarea id="description" placeholder="Description" required></textarea>
+            <select id="category" required>
+                <option value="">Select Category</option>
+                <option value="electronic">Electronic</option>
+                <option value="metal">Metal</option>
+                <option value="plastic">Plastic</option>
+                <option value="paper">Paper</option>
+            </select>
             <input type="hidden" id="imageUrl">
             <button type="submit">Post Item</button>
         </form>
@@ -158,7 +185,6 @@
         <button type="submit">Send</button>
     </form>
 </div>
-<script src="https://www.google.com/search?q=https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 <script src="/socket.io/socket.io.js"></script>
 <script src="script.js"></script>
 

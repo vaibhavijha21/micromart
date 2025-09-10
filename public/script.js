@@ -81,14 +81,19 @@ const handleApplication = () => {
     const imageInput = document.getElementById("imageInput");
     const titleInput = document.getElementById("title");
     const descriptionInput = document.getElementById("description");
+    const categoryInput = document.getElementById("category");
+    const locationInput = document.getElementById("location");
     const loadingMessage = document.getElementById("loading-message");
     const imageUrlInput = document.getElementById("imageUrl");
     
     // New UI elements
     const postItemBtn = document.getElementById("postItemBtn");
+    const requestBtn = document.getElementById("requestBtn");
     const postItemModal = document.getElementById("postItemModal");
     const closePostModal = document.getElementById("closePostModal");
     const searchInput = document.getElementById("searchInput");
+    const locationFilter = document.getElementById("locationFilter");
+    const categoryFilter = document.getElementById("categoryFilter");
     const navItems = document.querySelectorAll('.nav-item');
     const contentSections = document.querySelectorAll('.content-section');
 
@@ -154,6 +159,13 @@ const handleApplication = () => {
         });
     }
 
+    // Navigate to Requests page
+    if (requestBtn) {
+        requestBtn.addEventListener('click', () => {
+            window.location.href = '/request.html';
+        });
+    }
+
     if (closePostModal) {
         closePostModal.addEventListener('click', () => {
             postItemModal.classList.add('hidden');
@@ -178,14 +190,51 @@ const handleApplication = () => {
             items.forEach(item => {
                 const title = item.querySelector('h3').textContent.toLowerCase();
                 const description = item.querySelector('p').textContent.toLowerCase();
+                const location = item.querySelector('.item-location span')?.textContent.toLowerCase() || '';
                 
-                if (title.includes(searchTerm) || description.includes(searchTerm)) {
+                if (title.includes(searchTerm) || description.includes(searchTerm) || location.includes(searchTerm)) {
                     item.style.display = 'block';
                 } else {
                     item.style.display = 'none';
                 }
             });
         });
+    }
+
+    // Filter functionality
+    if (locationFilter) {
+        locationFilter.addEventListener('change', () => {
+            getItems();
+        });
+    }
+
+    if (categoryFilter) {
+        categoryFilter.addEventListener('change', () => {
+            getItems();
+        });
+    }
+
+    // Populate location filter with unique locations
+    async function populateLocationFilter() {
+        try {
+            const res = await fetch(`${API_URL}/items`);
+            const items = await res.json();
+            const locations = [...new Set(items.map(item => item.location).filter(Boolean))];
+            
+            if (locationFilter) {
+                // Clear existing options except "All Locations"
+                locationFilter.innerHTML = '<option value="all">All Locations</option>';
+                
+                locations.sort().forEach(location => {
+                    const option = document.createElement('option');
+                    option.value = location;
+                    option.textContent = location;
+                    locationFilter.appendChild(option);
+                });
+            }
+        } catch (error) {
+            console.error("Failed to populate location filter:", error);
+        }
     }
 
     signoutBtn.addEventListener('click', () => {
@@ -259,7 +308,7 @@ const handleApplication = () => {
         const file = e.target.files[0];
         if (!file) return;
 
-        loadingMessage.style.display = 'block';
+    loadingMessage.classList.remove('hidden');
         const reader = new FileReader();
         reader.onloadend = async () => {
             const base64Image = reader.result.split(',')[1];
@@ -270,14 +319,21 @@ const handleApplication = () => {
                     body: JSON.stringify({ base64Image })
                 });
                 const data = await res.json();
-                titleInput.value = data.title;
-                descriptionInput.value = data.description;
-                imageUrlInput.value = `data:image/jpeg;base64,${base64Image}`;
+                                titleInput.value = data.title;
+                                categoryInput.value = data.category;
+                                imageUrlInput.value = `data:image/jpeg;base64,${base64Image}`;
+                                // Animate autofilled fields
+                                titleInput.classList.add('highlight-animate');
+                                categoryInput.classList.add('highlight-animate');
+                                setTimeout(() => {
+                                    titleInput.classList.remove('highlight-animate');
+                                    categoryInput.classList.remove('highlight-animate');
+                                }, 1200);
             } catch (error) {
                 console.error("Error during AI analysis:", error);
                 alert("Failed to analyze image. Please fill out the form manually.");
             } finally {
-                loadingMessage.style.display = 'none';
+                loadingMessage.classList.add('hidden');
             }
         };
         reader.readAsDataURL(file);
@@ -287,6 +343,8 @@ const handleApplication = () => {
         e.preventDefault();
         const title = titleInput.value;
         const description = descriptionInput.value;
+        const category = categoryInput.value;
+        const location = locationInput.value;
         const imageUrl = imageUrlInput.value;
         const postedBy = currentUser.username;
 
@@ -294,7 +352,7 @@ const handleApplication = () => {
             const res = await fetch(`${API_URL}/items`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ title, description, imageUrl, postedBy })
+                body: JSON.stringify({ title, description, category, location, imageUrl, postedBy })
             });
             const data = await res.json();
             alert(data);
@@ -309,7 +367,16 @@ const handleApplication = () => {
     async function getItems() {
         console.log('getItems called');
         try {
-            const res = await fetch(`${API_URL}/items`);
+            const locationFilterValue = locationFilter ? locationFilter.value : 'all';
+            const categoryFilterValue = categoryFilter ? categoryFilter.value : 'all';
+            
+            let url = `${API_URL}/items`;
+            const params = new URLSearchParams();
+            if (locationFilterValue !== 'all') params.append('location', locationFilterValue);
+            if (categoryFilterValue !== 'all') params.append('category', categoryFilterValue);
+            if (params.toString()) url += '?' + params.toString();
+            
+            const res = await fetch(url);
             const items = await res.json();
             console.log('Items fetched:', items);
             itemsContainer.innerHTML = "";
@@ -318,10 +385,31 @@ const handleApplication = () => {
                     const div = document.createElement("div");
                     div.className = "item";
                     const username = item.postedBy ? item.postedBy : 'Unknown User';
+                    const category = item.category || 'plastic'; // Default fallback for existing items
+                    const location = item.location || 'Unknown Location';
+                    const imgSrc = (() => {
+                        let url = item.imageUrl || '';
+                        if (!url || url === 'no') return '';
+                        if (url.startsWith('http') || url.startsWith('data:')) return url;
+                        // normalize leading slashes
+                        if (url.startsWith('/uploads/')) {
+                            return `${API_URL}${url}`;
+                        }
+                        // strip any accidental leading 'uploads/' or '/'
+                        url = url.replace(/^\/*uploads\//, '').replace(/^\/+/, '');
+                        return `${API_URL}/uploads/${url}`;
+                    })();
                     div.innerHTML = `
                         <h3>${item.title}</h3>
                         <p>${item.description}</p>
-                        ${item.imageUrl ? `<img src="${item.imageUrl}" alt="${item.title}">` : ""}
+                        <div class="item-category">
+                            <span class="category-badge category-${category}">${category.charAt(0).toUpperCase() + category.slice(1)}</span>
+                        </div>
+                        <div class="item-location">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>${location}</span>
+                        </div>
+                        ${imgSrc ? `<img src="${imgSrc}" alt="${item.title}" loading="lazy">` : ""}
                         <p>Posted by: ${username}</p>
                         <small>${new Date(item.createdAt).toLocaleString()}</small>
                         ${username !== currentUser.username ? `<button class="connect-btn" data-seller="${username}">Connect with Seller</button>` : ''}
@@ -478,6 +566,7 @@ const handleApplication = () => {
 
     
     getItems();
+    populateLocationFilter();
 };
 
 const handleChatPage = () => {
@@ -588,5 +677,72 @@ document.addEventListener('DOMContentLoaded', () => {
         handleApplication();
     } else if (path === '/chat.html') {
         handleChatPage();
+    } else if (path === '/request.html') {
+        // Minimal request page handler if missing
+        if (typeof handleRequestPage === 'function') {
+            handleRequestPage();
+        } else {
+            // lightweight inline setup to avoid missing handler
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            if (!currentUser) { window.location.href = '/index.html'; return; }
+            const welcomeMessage = document.getElementById('welcome-message');
+            if (welcomeMessage) welcomeMessage.textContent = currentUser.username;
+            const signoutBtn = document.getElementById('signoutBtn');
+            if (signoutBtn) signoutBtn.addEventListener('click', () => { localStorage.removeItem('currentUser'); window.location.href = '/index.html'; });
+            const cancelBtn = document.getElementById('cancelRequest');
+            if (cancelBtn) cancelBtn.addEventListener('click', (e) => { e.preventDefault(); window.location.href = '/app.html'; });
+            const requestsList = document.getElementById('requestsList');
+            const requestSearchInput = document.getElementById('requestSearchInput');
+            const requestCategoryFilter = document.getElementById('requestCategoryFilter');
+            const requestsCount = document.getElementById('requestsCount');
+            function renderRequests(){
+                const all = JSON.parse(localStorage.getItem('requests') || '[]');
+                let filtered = [...all];
+                const q = (requestSearchInput?.value || '').toLowerCase();
+                const cat = requestCategoryFilter?.value || 'all';
+                if (q) filtered = filtered.filter(r => r.title.toLowerCase().includes(q) || r.description.toLowerCase().includes(q) || (r.location||'').toLowerCase().includes(q) || (r.requestedBy||'').toLowerCase().includes(q));
+                if (cat !== 'all') filtered = filtered.filter(r => (r.category||'') === cat);
+                requestsList.innerHTML='';
+                if (filtered.length===0){ requestsList.innerHTML='<p>No matching requests.</p>'; if(requestsCount) requestsCount.textContent='0'; return; }
+                filtered.sort((a,b)=> new Date(b.createdAt)-new Date(a.createdAt)).forEach(req=>{
+                    const div=document.createElement('div');
+                    div.className='item';
+                    const category=req.category||'general';
+                    const location=req.location||'Not specified';
+                    div.innerHTML=`
+                        <h3>${req.title}</h3>
+                        <p>${req.description}</p>
+                        <div class="item-category">
+                            <span class="category-badge category-${category}">${category.charAt(0).toUpperCase()+category.slice(1)}</span>
+                        </div>
+                        <div class="item-location">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>${location}</span>
+                        </div>
+                        <p>Requested by: ${req.requestedBy||'Unknown'}</p>
+                        <small>${new Date(req.createdAt).toLocaleString()}</small>
+                    `;
+                    requestsList.appendChild(div);
+                });
+                if (requestsCount) requestsCount.textContent = String(filtered.length);
+            }
+            const form = document.getElementById('requestForm');
+            if (form) form.addEventListener('submit',(e)=>{
+                e.preventDefault();
+                const title=form.requestTitle.value.trim();
+                const description=form.requestDescription.value.trim();
+                const category=form.requestCategory.value;
+                const location=form.requestLocation.value.trim();
+                if(!title||!description||!category){ alert('Please fill out title, description, and category.'); return; }
+                const arr = JSON.parse(localStorage.getItem('requests')||'[]');
+                arr.push({ title, description, category, location, requestedBy: currentUser.username, createdAt: new Date().toISOString() });
+                localStorage.setItem('requests', JSON.stringify(arr));
+                form.reset();
+                renderRequests();
+            });
+            if (requestSearchInput) requestSearchInput.addEventListener('input', renderRequests);
+            if (requestCategoryFilter) requestCategoryFilter.addEventListener('change', renderRequests);
+            renderRequests();
+        }
     }
 });
