@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv').config();
 const path = require('path');
-const fetch = require('node-fetch');
+const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 const http = require('http');
 const { Server } = require('socket.io');
 
@@ -24,22 +24,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // MongoDB Connection
 const uri = process.env.MONGO_URI;
-async function connectToDatabaseAndStart() {
-    try {
-        if (!uri) {
-            console.error('MONGO_URI is not set. Please configure your environment variable.');
-            process.exit(1);
-        }
-        await mongoose.connect(uri, { serverSelectionTimeoutMS: 15000 });
-        console.log('MongoDB connection established successfully');
-        server.listen(port, () => {
-            console.log(`Server is running on port: ${port}`);
-        });
-    } catch (err) {
-        console.error('MongoDB connection error:', err);
-        process.exit(1);
-    }
-}
+mongoose.connect(uri)
+    .then(() => console.log('MongoDB connection established successfully'))
+    .catch(err => console.log('MongoDB connection error:', err));
 
 // Define User, Item, and Chat Schemas
 const userSchema = new mongoose.Schema({
@@ -200,9 +187,6 @@ app.post('/ai-analyze-image', async (req, res) => {
     };
 
     const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) {
-        return res.status(500).json({ error: 'Missing GEMINI_API_KEY environment variable on server.' });
-    }
     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
 
     try {
@@ -211,11 +195,6 @@ app.post('/ai-analyze-image', async (req, res) => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
         });
-        if (!aiResponse.ok) {
-            const text = await aiResponse.text();
-            console.error('Gemini API error:', aiResponse.status, text);
-            return res.status(502).json({ error: 'Upstream AI API error', status: aiResponse.status });
-        }
         const aiResult = await aiResponse.json();
         
         if (aiResult.candidates && aiResult.candidates.length > 0) {
@@ -231,7 +210,6 @@ app.post('/ai-analyze-image', async (req, res) => {
             
             res.json(parsedJson);
         } else {
-            console.error('AI invalid response shape:', JSON.stringify(aiResult).slice(0, 500));
             res.status(500).json({ error: "AI model did not return a valid response." });
         }
     } catch (error) {
@@ -315,8 +293,9 @@ io.on('connection', (socket) => {
     });
 });
 
-// Start server only after DB is connected
-connectToDatabaseAndStart();
+server.listen(port, () => {
+    console.log(`Server is running on port: ${port}`);
+});
 
 
 
