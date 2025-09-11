@@ -16,7 +16,9 @@
 	gap: 18px;
 	align-items: center;
 }
-
+#requestsList {
+  margin-left: 23px;  
+}
 /* Modern Button Styles */
 .modern-btn {
 	background: #082D34;
@@ -377,7 +379,7 @@ min-height: 100vh;
 /* Top Bar */
 .top-bar {
 background-color: transparent;
-padding: 15px 30px;
+padding: 15px 17px;
 border-bottom: none;
 display: flex;
 justify-content: space-between;
@@ -438,7 +440,7 @@ transform: translateY(-1px);
 
 /* Search Container */
 .search-container {
-padding: 20px 30px;
+padding: 20px 15px;
 color:#d9e2a8;
 background-color: transparent;
 border-bottom: none;
@@ -481,7 +483,7 @@ border-color: #3498db;
 /* Content Sections */
 .content-sections {
 flex: 1;
-padding: 30px;
+padding: 2px 30px;
 background-color: #082D34;
 }
 
