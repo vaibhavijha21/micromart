@@ -1032,7 +1032,7 @@
             </div>
             <div class="video-container" id="video-container">
                 <div class="video-placeholder" id="video-placeholder">
-                    <h3>Click to play demo video</h3>
+                    <video src="video.mp4"></video>
                 </div>
             </div>
         </div>
@@ -1382,7 +1382,14 @@
         
         // Video placeholder click handler
         document.getElementById('video-placeholder').addEventListener('click', function() {
-            alert('Video player would launch with a professional demonstration of the Micromart platform. In a real implementation, this would play a professionally produced video showcasing the platform features.');
+            const placeholder = this;
+            const video = placeholder.querySelector('video');
+            if (!video) return;
+            placeholder.classList.add('playing');
+            video.setAttribute('controls', 'controls');
+            video.setAttribute('playsinline', '');
+            video.setAttribute('autoplay', '');
+            try { video.play(); } catch (e) { /* ignore autoplay errors */ }
         });
     </script>
 </body>
