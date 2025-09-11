@@ -109,7 +109,7 @@ const handleApplication = () => {
     const currentUser = JSON.parse(localStorage.getItem('currentUser'));
 
     if (!currentUser) {
-        window.location.href = '/user.html';
+        window.location.href = '/index.html';
         return;
     }
 
