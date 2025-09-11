@@ -532,7 +532,7 @@ border-color: #3498db;
 /* Content Sections */
 .content-sections {
 flex: 1;
-padding: 2px 30px;
+padding: 2px 23px;
 background-color: #082D34;
 }
 
@@ -542,7 +542,8 @@ display: none;
 
 .content-section.active {
 display: block;
-color:#d9e2a8
+color:#082D34;
+font-weight: bold;
 }
 
 .section-header {
